@@ -73,6 +73,7 @@ class Recommender:
                 continue
             seen.add(key)
             out.append({
+                "id": int(j) + 1,
                 "title": d.title[j],
                 "author": d.author[j],
                 "rating": None if pd.isna(d.avg_rating[j]) else float(d.avg_rating[j]),
@@ -84,6 +85,10 @@ class Recommender:
                 break
         return out
 
+    def similar(self, idx, n=6):
+        qvec = self.X[idx]
+        return self._top_unique(cosine_similarity(qvec, self.X).ravel(), qvec, exclude=idx, n=n)
+    
     def by_title(self, title, n=5):
         m = self.df.index[self.titles.str.contains(title.lower(), regex=False)]
         if len(m) == 0:
